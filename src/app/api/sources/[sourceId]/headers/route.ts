@@ -3,7 +3,7 @@ import { getSource } from "@/lib/db";
 import { readSheetRows } from "@/lib/sheet";
 
 export async function GET(request: Request, { params }: { params: Promise<{ sourceId: string }> }) {
-  const source = getSource((await params).sourceId);
+  const source = await getSource((await params).sourceId);
   if (!source) return NextResponse.json({ error: "Source not found." }, { status: 404 });
   const queue = new URL(request.url).searchParams.get("queue");
   if (queue !== "upcoming" && queue !== "in_transit") return NextResponse.json({ error: "Choose upcoming or in_transit." }, { status: 400 });
