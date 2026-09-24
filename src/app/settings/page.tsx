@@ -10,10 +10,8 @@ export default async function SettingsPage({
   searchParams: Promise<{ source?: string }>;
 }) {
   const { source: sourceId } = await searchParams;
-  const [sources, orderCounts] = await Promise.all([
-    listSources(),
-    getSourceOrderCounts(),
-  ]);
+  const sources = listSources();
+  const orderCounts = getSourceOrderCounts();
 
   return (
     <AppShell currentPath="/settings">

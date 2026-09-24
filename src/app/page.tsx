@@ -4,12 +4,10 @@ import { getDashboardStats, listConsignments, listSources } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
-  const [stats, sources, allOrders] = await Promise.all([
-    getDashboardStats(),
-    listSources(),
-    listConsignments({ limit: 2000 }),
-  ]);
+export default function DashboardPage() {
+  const stats = getDashboardStats();
+  const sources = listSources();
+  const allOrders = listConsignments({ limit: 2000 });
 
   return (
     <AppShell currentPath="/">

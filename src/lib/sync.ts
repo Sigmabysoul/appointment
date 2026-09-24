@@ -2,7 +2,7 @@ import { getSource, importRows, listSources, reconcileActiveSourceRows, recordSo
 import { readSheetRows } from "@/lib/sheet";
 
 export async function syncSource(sourceId: string) {
-  const source = await getSource(sourceId);
+  const source = getSource(sourceId);
   if (!source) throw new Error("Source not found.");
   if (!source.isActive) return { sourceId, skipped: true, imported: { upcoming: 0, inTransit: 0 } };
   try {
@@ -10,10 +10,10 @@ export async function syncSource(sourceId: string) {
       readSheetRows(source.spreadsheetId, source.upcomingTab),
       readSheetRows(source.spreadsheetId, source.inTransitTab),
     ]);
-    const importedUpcoming = await importRows(source, "upcoming", source.upcomingTab, upcoming.rows);
-    const importedTransit = await importRows(source, "in_transit", source.inTransitTab, inTransit.rows);
-    await reconcileActiveSourceRows(source.id, [...importedUpcoming.externalKeys, ...importedTransit.externalKeys]);
-    await recordSourceSync(source.id, null);
+    const importedUpcoming = importRows(source, "upcoming", source.upcomingTab, upcoming.rows);
+    const importedTransit = importRows(source, "in_transit", source.inTransitTab, inTransit.rows);
+    reconcileActiveSourceRows(source.id, [...importedUpcoming.externalKeys, ...importedTransit.externalKeys]);
+    recordSourceSync(source.id, null);
     return {
       sourceId,
       displayName: source.displayName,
@@ -23,13 +23,13 @@ export async function syncSource(sourceId: string) {
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to sync source.";
-    await recordSourceSync(source.id, message);
+    recordSourceSync(source.id, message);
     throw new Error(message);
   }
 }
 
 export async function syncSourceBySpreadsheetId(spreadsheetId: string) {
-  const allSources = await listSources();
+  const allSources = listSources();
   const matched = allSources.find(
     (s) => s.spreadsheetId === spreadsheetId || s.spreadsheetUrl.includes(spreadsheetId),
   );
@@ -40,8 +40,7 @@ export async function syncSourceBySpreadsheetId(spreadsheetId: string) {
 }
 
 export async function syncAllActiveSources() {
-  const allSources = await listSources();
-  const activeSources = allSources.filter((source) => source.isActive);
+  const activeSources = listSources().filter((source) => source.isActive);
   const results = await Promise.allSettled(activeSources.map((source) => syncSource(source.id)));
   return results.map((result, index) =>
     result.status === "fulfilled"

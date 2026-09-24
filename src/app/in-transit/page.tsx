@@ -4,8 +4,8 @@ import { listConsignments } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function InTransitPage() {
-  const orders = await listConsignments({ limit: 2000 });
+export default function InTransitPage() {
+  const orders = listConsignments({ limit: 2000 });
 
   return (
     <AppShell currentPath="/in-transit">
