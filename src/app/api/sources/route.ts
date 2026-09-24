@@ -35,12 +35,12 @@ function validatePayload(payload: SourceRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ sources: listSources() });
+  return NextResponse.json({ sources: await listSources() });
 }
 
 export async function POST(request: Request) {
   try {
-    const source = createSource(validatePayload(await request.json()));
+    const source = await createSource(validatePayload(await request.json()));
     return NextResponse.json({ source }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to add source." }, { status: 400 });

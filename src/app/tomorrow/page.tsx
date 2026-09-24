@@ -4,8 +4,8 @@ import { listConsignments } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default function TomorrowOrdersPage() {
-  const allOrders = listConsignments({ limit: 2000 });
+export default async function TomorrowOrdersPage() {
+  const allOrders = await listConsignments({ limit: 2000 });
 
   return (
     <AppShell currentPath="/tomorrow">
@@ -24,4 +24,3 @@ export default function TomorrowOrdersPage() {
     </AppShell>
   );
 }
-

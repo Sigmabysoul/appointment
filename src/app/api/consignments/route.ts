@@ -21,9 +21,13 @@ export async function GET(request: Request) {
       }
     }
 
-    const consignments = listConsignments({ sourceId, query, limit });
-    const stats = getDashboardStats();
-    const sources = listSources().map((s) => ({
+    const [consignments, stats, allSources] = await Promise.all([
+      listConsignments({ sourceId, query, limit }),
+      getDashboardStats(),
+      listSources(),
+    ]);
+
+    const sources = allSources.map((s) => ({
       id: s.id,
       displayName: s.displayName,
       spreadsheetId: s.spreadsheetId,
@@ -45,4 +49,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
-
